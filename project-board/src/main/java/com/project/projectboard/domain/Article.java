@@ -1,4 +1,3 @@
-package com.project.projectboard.domain;
 
 import lombok.Getter;
 import lombok.Setter;
