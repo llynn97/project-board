@@ -3,6 +3,7 @@ package com.project.projectboard.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -16,7 +17,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "title"),
         @Index(columnList = "createdAt"),
@@ -25,13 +26,27 @@ import java.util.Set;
 @Entity
 public class Article extends AuditingFields {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Setter @Column(nullable = false) private String title;
-    @Setter @Column(nullable = false, length = 1000) private String content;
-    @Setter @Column(length = 1000) private String hashtag;
+    @Setter
+    @JoinColumn(name = "userId")
+    @ManyToOne(optional = false)
+    private UserAccount userAccount;
 
-    @OrderBy("id")
+    @Setter
+    @Column(nullable = false)
+    private String title;
+    @Setter
+    @Column(nullable = false, length = 1000)
+    private String content;
+    @Setter
+    @Column(length = 1000)
+    private String hashtag;
+
+
+    @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @ToString.Exclude  //순환참조 막기 위해서
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
@@ -40,14 +55,15 @@ public class Article extends AuditingFields {
     }
 
 
-    private Article(String title, String content, String hashtag) {
+    private Article(UserAccount userAccount, String title, String content, String hashtag) {
+        this.userAccount = userAccount;
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
     }
 
-    public static Article of(String title, String content, String hashtag) {
-        return new Article(title, content, hashtag);
+    public static Article of(UserAccount userAccount, String title, String content, String hashtag) {
+        return new Article(userAccount, title, content, hashtag);
     }
 
     @Override
