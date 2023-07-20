@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,gradle,intellij+all,windows,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,gradle,intellij+all,windows,visualstudiocode
 
+### JPA Buddy
+.jpb/
+
 
 ###Querydsl
 /src/main/generated
