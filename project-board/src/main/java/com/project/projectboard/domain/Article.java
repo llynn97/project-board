@@ -3,12 +3,7 @@ package com.project.projectboard.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.core.annotation.Order;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -60,6 +55,16 @@ public class Article extends AuditingFields {
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
+    }
+
+    public Article(UserAccount userAccount, String title, String content) {
+        this.userAccount = userAccount;
+        this.title = title;
+        this.content = content;
+    }
+
+    public static Article of(UserAccount userAccount, String title, String content) {
+        return new Article(userAccount, title, content);
     }
 
     public static Article of(UserAccount userAccount, String title, String content, String hashtag) {

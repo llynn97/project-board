@@ -1,6 +1,7 @@
 package com.project.projectboard.controller;
 
 import com.project.projectboard.config.SecurityConfig;
+import com.project.projectboard.dto.ArticleDto;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -72,6 +75,9 @@ class ArticleControllerTest {
                 .andExpect(view().name("articles/search-hashtag"));
 
     }
+
+
+
 
 
 
