@@ -1,7 +1,6 @@
 package com.project.projectboard.controller;
 
 import com.project.projectboard.domain.type.SearchType;
-import com.project.projectboard.dto.ArticleDto;
 import com.project.projectboard.dto.response.ArticleResponse;
 import com.project.projectboard.dto.response.ArticleWithCommentsResponse;
 import com.project.projectboard.service.ArticleService;
@@ -21,10 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 /**
- * 	/articles
- *  /articles/{article-id}
- * 	/articles/search
- * 	/articles/search-hashing
+ * /articles
+ * /articles/{article-id}
+ * /articles/search
+ * /articles/search-hashing
  **/
 @RequestMapping("/articles")
 @Controller
@@ -37,21 +36,22 @@ public class ArticleController {
     @GetMapping
     public String articles(@RequestParam(required = false) SearchType searchType,
                            @RequestParam(required = false) String searchValue,
-                           @PageableDefault(size = 10,sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable,
-                           ModelMap map){
-        Page<ArticleResponse> articles = articleService.searchArticles(searchType,searchValue,pageable).map(ArticleResponse::from);
-        List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(),articles.getTotalPages());
+                           @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                           ModelMap map) {
+        Page<ArticleResponse> articles = articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from);
+        List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
         map.addAttribute("articles", articles);
-        map.addAttribute("paginationBarNumbers",barNumbers);
+        map.addAttribute("paginationBarNumbers", barNumbers);
+        map.addAttribute("searchTypes", SearchType.values());
 
         return "articles/index";
     }
 
     @GetMapping("/{articleId}")
-    public String article(@PathVariable Long articleId,  ModelMap map){
+    public String article(@PathVariable Long articleId, ModelMap map) {
         ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticle(articleId));
-        map.addAttribute("article", article );
-        map.addAttribute("articleComments",article.getArticleCommentsResponse());
+        map.addAttribute("article", article);
+        map.addAttribute("articleComments", article.getArticleCommentsResponse());
         return "articles/detail";
     }
 }
