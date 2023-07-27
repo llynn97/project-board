@@ -4,7 +4,6 @@ import com.project.projectboard.domain.Article;
 import com.project.projectboard.domain.UserAccount;
 import com.project.projectboard.domain.type.SearchType;
 import com.project.projectboard.dto.ArticleDto;
-import com.project.projectboard.dto.ArticleUpdateDto;
 import com.project.projectboard.dto.ArticleWithCommentsDto;
 import com.project.projectboard.dto.UserAccountDto;
 import com.project.projectboard.repository.ArticleRepository;
@@ -14,10 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.web.servlet.MockMvc;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -112,11 +109,6 @@ class ArticleServiceTest {
         then(articleRepository).should().findAllDistinctHashtags();
 
     }
-
-
-
-
-
     @DisplayName("게시글을 조회하면, 게시글을 반환한다.")
     @Test
     void givenArticleId_whenSearchingArticle_thenReturnsArticle() {
@@ -124,7 +116,7 @@ class ArticleServiceTest {
         Article article = createArticle();
         given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
 
-        ArticleWithCommentsDto dto = sut.getArticle(articleId);
+        ArticleWithCommentsDto dto = sut.getArticleWithComments(articleId);
 
         assertThat(dto)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
@@ -155,7 +147,7 @@ class ArticleServiceTest {
         ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
         given(articleRepository.getReferenceById(dto.getId())).willReturn(article);
 
-        sut.updateArticle(dto);
+        sut.updateArticle(1L,dto);
 
         assertThat(article)
                 .hasFieldOrPropertyWithValue("title", dto.getTitle())
@@ -171,7 +163,7 @@ class ArticleServiceTest {
         ArticleDto dto = createArticleDto("새 타이틀", "내용","#spring");
         given(articleRepository.getReferenceById(dto.getId())).willThrow(EntityNotFoundException.class);
 
-        sut.updateArticle(dto);
+        sut.updateArticle(1L,dto);
 
         then(articleRepository).should().getReferenceById(dto.getId());
     }
