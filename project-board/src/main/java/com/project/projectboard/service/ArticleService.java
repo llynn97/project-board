@@ -44,11 +44,18 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public ArticleWithCommentsDto getArticle(Long articleId){
+    public ArticleWithCommentsDto getArticleWithComments(Long articleId){
         return articleRepository.findById(articleId)
                 .map(ArticleWithCommentsDto::from)
-                .orElseThrow(()-> new EntityNotFoundException("게시글이 없습니다 - articleId: "+articleId));
+                .orElseThrow(()-> new EntityNotFoundException("게시글이 없습니다 - articleId: "+ articleId));
 
+    }
+
+    @Transactional(readOnly = true)
+    public ArticleDto getArticle(Long articleId){
+        return articleRepository.findById(articleId)
+                .map(ArticleDto::from)
+                .orElseThrow(()->new EntityNotFoundException("게시글이 없습니다 - articleId: "+ articleId));
     }
 
 
@@ -56,9 +63,9 @@ public class ArticleService {
         articleRepository.save(dto.toEntity());
     }
 
-    public void updateArticle(ArticleDto dto) {
+    public void updateArticle(Long articleId, ArticleDto dto) {
         try{
-            Article article = articleRepository.getReferenceById(dto.getId());
+            Article article = articleRepository.getReferenceById(articleId);
             if(dto.getTitle() != null){article.setTitle(dto.getTitle());}
             if(dto.getContent() != null){article.setContent(dto.getContent());}
             article.setHashtag(dto.getHashtag());
