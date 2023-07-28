@@ -18,6 +18,11 @@
         </attr>
     </attr>
 
+    <attr sel=".article-id" th:name="articleId" th:value="*{id}" />
+    <attr sel=".comment-form" th:action="@{/comments/new}" th:method="post">
+        <attr sel=".comment-textbox" th:name="content" />
+    </attr>
+
     <attr sel="#article-comments" th:remove="all-but-first">
         <attr sel="li[0]" th:each="articleComment : ${articleComments}">
             <attr sel=".comment-delete-form" th:action="'/comments/' + ${articleComment.id} + '/delete'" th:method="post">

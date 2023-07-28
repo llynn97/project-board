@@ -25,7 +25,12 @@ public class ArticleCommentDto {
         return new ArticleCommentDto(id, articleId, userAccountDto, content, createdAt, createdBy, modifiedAt, modifiedBy);
     }
 
-    public static ArticleCommentDto from(ArticleComment entity){
+    public static ArticleCommentDto of(Long articleId, UserAccountDto userAccountDto, String content) {
+        return new ArticleCommentDto(null, articleId, userAccountDto, content, null, null, null, null);
+    }
+
+
+    public static ArticleCommentDto from(ArticleComment entity) {
         return new ArticleCommentDto(
                 entity.getId(),
                 entity.getArticle().getId(),
@@ -39,7 +44,13 @@ public class ArticleCommentDto {
         );
     }
 
-
+    public ArticleComment toEntity(Article article, UserAccount userAccount){
+        return ArticleComment.of(
+                userAccount,
+                content,
+                article
+        );
+    }
 
 
 }

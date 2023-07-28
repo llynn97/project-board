@@ -44,13 +44,31 @@ class ArticleCommentServiceTest {
     void givenArticleId_whenSearchingArticleComments_thenReturnsArticleComments() {
 
         Long articleId = 1L;
-        UserAccount userAccount = UserAccount.of("userId","password","email","nickname","memo");
-        given(articleRepository.findById(articleId)).willReturn(Optional.of(Article.of(userAccount,"title", "content", "#java")));
+        ArticleComment expected = createArticleComment("content");
+        UserAccount userAccount = UserAccount.of("uno","{noop}asdf1234","uno@mail.com","Uno","memo");
+        given(articleCommentRepository.findByArticle_Id(articleId)).willReturn(List.of(expected));
 
         List<ArticleCommentDto> articleComments = sut.searchArticleComments(articleId);
 
         assertThat(articleComments).isNotNull();
-        then(articleRepository).should().findById(articleId);
+        then(articleCommentRepository).should().findByArticle_Id(articleId);
+    }
+
+    @DisplayName("댓글 정보를 입력하면, 댓글을 저장한다.")
+    @Test
+    void givenArticleCommentInfo_whenSavingArticleComment_thenSavesArticleComment() {
+        // Given
+        ArticleCommentDto dto = createArticleCommentDto("댓글");
+        given(articleRepository.getReferenceById(dto.getArticleId())).willReturn(createArticle());
+        given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(null);
+
+        // When
+        sut.saveArticleComment(dto);
+
+        // Then
+        then(articleRepository).should().getReferenceById(dto.getArticleId());
+        then(articleCommentRepository).should(never()).getReferenceById(anyLong());
+        then(articleCommentRepository).should().save(any(ArticleComment.class));
     }
 
     @DisplayName("댓글 저장을 시도했는데 맞는 게시글이 없으면, 경고 로그를 찍고 아무 동작을 하지 않는다")
@@ -65,34 +83,6 @@ class ArticleCommentServiceTest {
         then(articleCommentRepository).shouldHaveNoInteractions();
     }
 
-    @DisplayName("댓글 정보를 입력하면, 댓글을 수정한다")
-    @Test
-    void givenArticleCommentInfo_whenUpdatingArticleComment_thenUpdateArticleComment(){
-        String oldContent = "content";
-        String updatedContent = "댓글";
-        ArticleComment articleComment = createArticleComment(1L,oldContent);
-        ArticleCommentDto dto = createArticleCommentDto(updatedContent);
-        given(articleCommentRepository.getReferenceById(dto.getId())).willReturn(articleComment);
-
-        sut.updateArticleComment(dto);
-
-        assertThat(articleComment.getContent())
-                .isNotEqualTo(oldContent)
-                .isEqualTo(updatedContent);
-        then(articleCommentRepository).should().getReferenceById(dto.getId());
-
-    }
-
-    @DisplayName("없는 댓글 정보를 수정하려고 하면, 경고 로그를 찍고 아무 동작을 하지 않는다")
-    @Test
-    void givenNonExistentArticleComment_whenUpdatingArticleComment_thenLogsWarningAndDoesNothing(){
-        ArticleCommentDto dto = createArticleCommentDto("댓글");
-        given(articleCommentRepository.getReferenceById(dto.getId())).willThrow(EntityNotFoundException.class);
-
-        sut.updateArticleComment(dto);
-
-        then(articleRepository).should().getReferenceById(dto.getId());
-    }
 
     @DisplayName("댓글 ID를 입력하면, 댓글을 삭제한다.")
     @Test
@@ -100,13 +90,13 @@ class ArticleCommentServiceTest {
         // Given
         Long articleCommentId = 1L;
         String userId = "uno";
-       // willDoNothing().given(articleCommentRepository).deleteByIdAndUserAccount_UserId(articleCommentId, userId);
+        willDoNothing().given(articleCommentRepository).deleteById(articleCommentId);
 
         // When
         sut.deleteArticleComment(articleCommentId);
 
         // Then
-       // then(articleCommentRepository).should().deleteByIdAndUserAccount_UserId(articleCommentId, userId);
+        then(articleCommentRepository).should().deleteById(articleCommentId);
     }
 
 
@@ -142,14 +132,12 @@ class ArticleCommentServiceTest {
     }
 
 
-    private ArticleComment createArticleComment(Long id, String content) {
+    private ArticleComment createArticleComment(String content) {
         ArticleComment articleComment = ArticleComment.of(
                 createUserAccount(),
                 content,
                 createArticle()
         );
-        ReflectionTestUtils.setField(articleComment, "id", id);
-
         return articleComment;
     }
 
