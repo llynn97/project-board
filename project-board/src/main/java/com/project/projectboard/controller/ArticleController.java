@@ -6,6 +6,7 @@ import com.project.projectboard.dto.UserAccountDto;
 import com.project.projectboard.dto.request.ArticleRequest;
 import com.project.projectboard.dto.response.ArticleResponse;
 import com.project.projectboard.dto.response.ArticleWithCommentsResponse;
+import com.project.projectboard.dto.security.BoardPrincipal;
 import com.project.projectboard.service.ArticleService;
 import com.project.projectboard.service.PaginationService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -77,8 +79,9 @@ public class ArticleController {
     }
 
     @PostMapping("/form")
-    public String postNewArticle(ArticleRequest articleRequest){
-        articleService.saveArticle(articleRequest.toDto(UserAccountDto.of("uno","{noop}asdf1234","uno@mail.com","Uno","memo")));
+    public String postNewArticle(ArticleRequest articleRequest,
+                                 @AuthenticationPrincipal BoardPrincipal boardPrincipal){
+        articleService.saveArticle(articleRequest.toDto(boardPrincipal.toDto()));
         return "redirect:/articles";
     }
 
@@ -91,14 +94,16 @@ public class ArticleController {
     }
 
     @PostMapping("/{articleId}/form")
-    public String updateArticle(@PathVariable Long articleId, ArticleRequest articleRequest){
-        articleService.updateArticle(articleId, articleRequest.toDto(UserAccountDto.of("Uno","password","email@gcom","nickname","memo")));
+    public String updateArticle(@PathVariable Long articleId, ArticleRequest articleRequest,
+                                @AuthenticationPrincipal BoardPrincipal boardPrincipal){
+        articleService.updateArticle(articleId, articleRequest.toDto(boardPrincipal.toDto()));
         return "redirect:/articles/"+ articleId;
     }
 
     @PostMapping("/{articleId}/delete")
-    public String deleteArticle(@PathVariable Long articleId){
-        articleService.deleteArticle(articleId);
+    public String deleteArticle(@PathVariable Long articleId,
+                                @AuthenticationPrincipal BoardPrincipal boardPrincipal){
+        articleService.deleteArticle(articleId, boardPrincipal.getUsername());
         return "redirect:/articles";
     }
 }

@@ -1,10 +1,12 @@
 package com.project.projectboard.service;
 
 import com.project.projectboard.domain.Article;
+import com.project.projectboard.domain.UserAccount;
 import com.project.projectboard.domain.type.SearchType;
 import com.project.projectboard.dto.ArticleDto;
 import com.project.projectboard.dto.ArticleWithCommentsDto;
 import com.project.projectboard.repository.ArticleRepository;
+import com.project.projectboard.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,7 @@ import java.util.List;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -66,17 +69,19 @@ public class ArticleService {
     public void updateArticle(Long articleId, ArticleDto dto) {
         try{
             Article article = articleRepository.getReferenceById(articleId);
-            if(dto.getTitle() != null){article.setTitle(dto.getTitle());}
-            if(dto.getContent() != null){article.setContent(dto.getContent());}
-            article.setHashtag(dto.getHashtag());
-
+            UserAccount userAccount = userAccountRepository.getReferenceById(dto.getUserAccountDto().getUserId());
+            if(article.getUserAccount().equals(userAccount)){
+                if(dto.getTitle() != null){article.setTitle(dto.getTitle());}
+                if(dto.getContent() != null){article.setContent(dto.getContent());}
+                article.setHashtag(dto.getHashtag());
+            }
         }catch (EntityNotFoundException e){
-            log.warn("게시글 업데이트 실패. 게시글을 찾을 수 없습니다 - dto: {}", dto);
+            log.warn("게시글 업데이트 실패. 게시글을 수정하는데 필요한 정보를 찾을 수 없습니다 - {}", e.getLocalizedMessage());
         }
     }
 
-    public void deleteArticle(long articleId) {
-        articleRepository.deleteById(articleId);
+    public void deleteArticle(long articleId, String userId) {
+        articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
     }
 
     @Transactional(readOnly = true)
