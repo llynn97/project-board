@@ -572,3 +572,6 @@ Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus
 
 Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.', 'Wilmer', 'Ingra', '2021-07-19 14:18:17', '2022-01-23 17:29:54')
 ;
+
+insert into article (user_id, title, content,hashtag, created_by, modified_by, created_at, modified_at) values ('uno','abddd','ccccc','#java','uno','uno','2021-07-19 14:18:17', '2022-01-23 17:29:54'),('uno','abddd','ccddsdccc','#java','uno','uno','2021-02-13 07:35:14', '2022-01-23 17:29:54'),
+                                                                                                               ('uno','apple','ccddsdccc','#spring','uno','uno','2021-08-18 08:08:42', '2021-11-04 15:44:08');
