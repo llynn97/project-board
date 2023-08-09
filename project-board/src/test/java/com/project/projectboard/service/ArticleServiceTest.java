@@ -7,6 +7,7 @@ import com.project.projectboard.dto.ArticleDto;
 import com.project.projectboard.dto.ArticleWithCommentsDto;
 import com.project.projectboard.dto.UserAccountDto;
 import com.project.projectboard.repository.ArticleRepository;
+import com.project.projectboard.repository.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,9 @@ class ArticleServiceTest {
     private ArticleService sut;
     @Mock
     private ArticleRepository articleRepository;
+
+    @Mock
+    private UserAccountRepository userAccountRepository;
 
 
 
@@ -146,6 +150,7 @@ class ArticleServiceTest {
         Article article = createArticle();
         ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
         given(articleRepository.getReferenceById(dto.getId())).willReturn(article);
+        given(userAccountRepository.getReferenceById(dto.getUserAccountDto().getUserId())).willReturn(dto.getUserAccountDto().toEntity());
 
         sut.updateArticle(1L,dto);
 
@@ -155,6 +160,7 @@ class ArticleServiceTest {
                 .hasFieldOrPropertyWithValue("hashtag", dto.getHashtag());
 
         then(articleRepository).should().getReferenceById(dto.getId());
+        then(userAccountRepository).should().getReferenceById(dto.getUserAccountDto().getUserId());
     }
 
     @DisplayName("없는 게시글의 수정 정보를 입력하면, 경고 로그를 찍고 아무 것도 하지 않는다.")
@@ -173,11 +179,12 @@ class ArticleServiceTest {
     @Test
     void givenArticleId_whenDeletingArticle_thenDeletesArticle() {
         Long articleId = 1L;
-        willDoNothing().given(articleRepository).deleteById(articleId);
+        String userId= "uno";
+        willDoNothing().given(articleRepository).deleteByIdAndUserAccount_UserId(articleId,userId);
 
-        sut.deleteArticle(1L);
+        sut.deleteArticle(1L,userId);
 
-        then(articleRepository).should().deleteById(articleId);
+        then(articleRepository).should().deleteByIdAndUserAccount_UserId(articleId,userId);
     }
 
     private Article createArticle(Long id) {
