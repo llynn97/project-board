@@ -18,6 +18,8 @@ Spring Boot
 * H2 Database
 * MySQL Driver
 * Lombok
+
+그 외 
 * QueryDSL 5.0.0
 * BootStrap 5.2.0 Beta1
 * Heroku
