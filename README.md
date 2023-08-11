@@ -30,5 +30,6 @@ Spring Boot
 ## Reference
 * 유즈케이스 다이어그램
 * API Endpoint 구글 시트
+  https://docs.google.com/spreadsheets/d/1PdfgZt-3rIbUdP8KDW6XkowI-LhW3tb5JPNrIE949e8/edit#gid=0
     
   
