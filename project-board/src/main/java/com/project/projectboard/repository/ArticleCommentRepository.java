@@ -31,4 +31,3 @@ public interface ArticleCommentRepository extends
         bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);
     }
 }
-
