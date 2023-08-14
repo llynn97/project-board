@@ -40,6 +40,3 @@ public interface ArticleRepository extends
         bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);
     }
 }
-
-
-
