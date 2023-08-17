@@ -2,6 +2,7 @@ package com.project.projectboard.service;
 
 import com.project.projectboard.domain.Article;
 import com.project.projectboard.domain.ArticleComment;
+import com.project.projectboard.domain.Hashtag;
 import com.project.projectboard.domain.UserAccount;
 import com.project.projectboard.dto.ArticleCommentDto;
 import com.project.projectboard.dto.ArticleDto;
@@ -20,6 +21,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -145,9 +147,9 @@ class ArticleCommentServiceTest {
         Article article = Article.of(
                 createUserAccount(),
                 "title",
-                "content",
-                "hashtag"
+                "content"
         );
+        article.addHashtags(Set.of(createHashtag(article)));
         ReflectionTestUtils.setField(article, "id", 1L);
 
         return article;
@@ -163,22 +165,8 @@ class ArticleCommentServiceTest {
         );
     }
 
-    private ArticleDto createArticleDto() {
-        return createArticleDto("title", "content","#springboot");
-    }
-
-    private ArticleDto createArticleDto(String title, String content,String hashtag) {
-        return ArticleDto.of(
-                1L,
-                createUserAccountDto(),
-                title,
-                content,
-                hashtag,
-                LocalDateTime.now(),
-                "Uno",
-                LocalDateTime.now(),
-                "Uno"
-                );
+    private Hashtag createHashtag(Article article) {
+        return Hashtag.of("java");
     }
 
 

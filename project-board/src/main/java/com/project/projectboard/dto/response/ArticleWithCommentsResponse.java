@@ -1,6 +1,7 @@
 package com.project.projectboard.dto.response;
 
 import com.project.projectboard.dto.ArticleWithCommentsDto;
+import com.project.projectboard.dto.HashtagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,15 +16,15 @@ public class ArticleWithCommentsResponse {
     Long id;
     String title;
     String content;
-    String hashtag;
+    Set<String> hashtags;
     LocalDateTime createdAt;
     String email;
     String nickname;
     String userId;
     Set<ArticleCommentResponse> articleCommentsResponse;
 
-    public static ArticleWithCommentsResponse of(Long id, String title, String content, String hashtag, LocalDateTime createdAt, String email, String nickname, String userId, Set<ArticleCommentResponse> articleCommentsResponse){
-        return new ArticleWithCommentsResponse(id, title, content, hashtag, createdAt, email, nickname, userId, articleCommentsResponse);
+    public static ArticleWithCommentsResponse of(Long id, String title, String content, Set<String> hashtags, LocalDateTime createdAt, String email, String nickname, String userId, Set<ArticleCommentResponse> articleCommentsResponse){
+        return new ArticleWithCommentsResponse(id, title, content, hashtags, createdAt, email, nickname, userId, articleCommentsResponse);
     }
 
     public static ArticleWithCommentsResponse from(ArticleWithCommentsDto dto){
@@ -35,7 +36,9 @@ public class ArticleWithCommentsResponse {
                 dto.getId(),
                 dto.getTitle(),
                 dto.getContent(),
-                dto.getHashtag(),
+                dto.getHashtagDtos().stream()
+                                .map(HashtagDto::getHashtagName)
+                                .collect(Collectors.toUnmodifiableSet()),
                 dto.getCreatedAt(),
                 dto.getUserAccountDto().getEmail(),
                 nickname,
