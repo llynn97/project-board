@@ -9,6 +9,7 @@ import com.project.projectboard.domain.type.FormStatus;
 import com.project.projectboard.domain.type.SearchType;
 import com.project.projectboard.dto.ArticleDto;
 import com.project.projectboard.dto.ArticleWithCommentsDto;
+import com.project.projectboard.dto.HashtagDto;
 import com.project.projectboard.dto.UserAccountDto;
 import com.project.projectboard.dto.request.ArticleRequest;
 import com.project.projectboard.dto.response.ArticleResponse;
@@ -156,13 +157,16 @@ class ArticleControllerTest {
     @Test
     void givenAuthorizedUser_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
         Long articleId = 1L;
+        Long totalCount = 1L;
         given(articleService.getArticleWithComments(articleId)).willReturn(createArticleWithCommentsDto());
         mvc.perform(get("/articles/"+articleId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
                 .andExpect(model().attributeExists("article"))
-                .andExpect(model().attributeExists("articleComments"));
+                .andExpect(model().attributeExists("articleComments"))
+                .andExpect(model().attribute("totalCount",totalCount))
+                .andExpect(model().attribute("searchTypeHashtag",SearchType.HASHTAG));
         then(articleService).should().getArticleWithComments(articleId);
     }
 
@@ -245,7 +249,7 @@ class ArticleControllerTest {
     @Test
     void givenNewArticleInfo_whenRequesting_thenSavesNewArticle() throws Exception {
 
-        ArticleRequest articleRequest = ArticleRequest.of("new title","new content","#java");
+        ArticleRequest articleRequest = ArticleRequest.of("new title","new content");
         willDoNothing().given(articleService).saveArticle(any(ArticleDto.class));
 
         mvc.perform(post("/articles/form")
@@ -298,7 +302,7 @@ class ArticleControllerTest {
     void givenUpdatedArticleInfo_whenRequesting_thenUpdatesNewArticle() throws Exception {
 
         long articleId = 1L;
-        ArticleRequest articleRequest = ArticleRequest.of("new title","new content","#jave");
+        ArticleRequest articleRequest = ArticleRequest.of("new title","new content");
         willDoNothing().given(articleService).updateArticle(eq(articleId),any(ArticleDto.class));
 
 
@@ -340,8 +344,7 @@ class ArticleControllerTest {
         Article article = Article.of(
                 createUserAccount(),
                 "title",
-                "content",
-                "hashtag"
+                "content"
         );
         return article;
     }
@@ -385,7 +388,7 @@ class ArticleControllerTest {
                 Set.of(),
                 "title",
                 "content",
-                "#java",
+                Set.of(HashtagDto.of("java")),
                 LocalDateTime.now(),
                 "uno",
                 LocalDateTime.now(),
@@ -398,7 +401,7 @@ class ArticleControllerTest {
                 createUserAccountDto(),
                 "title",
                 "content",
-                "#java"
+                Set.of(HashtagDto.of("java"))
         );
     }
 
