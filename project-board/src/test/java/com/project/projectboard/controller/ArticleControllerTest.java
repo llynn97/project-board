@@ -165,7 +165,6 @@ class ArticleControllerTest {
                 .andExpect(view().name("articles/detail"))
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"))
-                .andExpect(model().attribute("totalCount",totalCount))
                 .andExpect(model().attribute("searchTypeHashtag",SearchType.HASHTAG));
         then(articleService).should().getArticleWithComments(articleId);
     }

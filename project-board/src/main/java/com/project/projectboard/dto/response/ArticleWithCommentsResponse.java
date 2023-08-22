@@ -1,12 +1,17 @@
 package com.project.projectboard.dto.response;
 
+import com.project.projectboard.dto.ArticleCommentDto;
 import com.project.projectboard.dto.ArticleWithCommentsDto;
 import com.project.projectboard.dto.HashtagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
@@ -43,9 +48,31 @@ public class ArticleWithCommentsResponse {
                 dto.getUserAccountDto().getEmail(),
                 nickname,
                 dto.getUserAccountDto().getUserId(),
-                dto.getArticleCommentDtos().stream()
-                        .map(ArticleCommentResponse::from)
-                        .collect(Collectors.toSet())
+                organizeChildComments(dto.getArticleCommentDtos())
         );
+    }
+
+    private static Set<ArticleCommentResponse> organizeChildComments(Set<ArticleCommentDto> dtos){
+        Map<Long,ArticleCommentResponse> map = dtos.stream()
+                .map(ArticleCommentResponse::from)
+                .collect(Collectors.toMap(ArticleCommentResponse::getId, Function.identity()));
+
+        map.values().stream()
+                .filter(ArticleCommentResponse::hasParentComment)
+                .forEach(comment -> {
+                    ArticleCommentResponse parentComment = map.get(comment.getParentCommentId());
+                    parentComment.getChildComments().add(comment);
+                });
+
+        return map.values().stream()
+                .filter(comment -> !comment.hasParentComment())
+                .collect(Collectors.toCollection(() ->
+                       new TreeSet<>(
+                               Comparator
+                                       .comparing(ArticleCommentResponse::getCreatedAt)
+                                       .reversed()
+                                       .thenComparing(ArticleCommentResponse::getId)
+                       )
+                ));
     }
 }
