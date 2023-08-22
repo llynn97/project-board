@@ -7,6 +7,7 @@ import com.project.projectboard.dto.ArticleCommentDto;
 import com.project.projectboard.dto.UserAccountDto;
 import com.project.projectboard.repository.ArticleCommentRepository;
 import com.project.projectboard.repository.ArticleRepository;
+import com.project.projectboard.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class ArticleCommentService {
 
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Transactional(readOnly = true)
     public List<ArticleCommentDto> searchArticleComments(Long articleId) {
@@ -36,10 +38,14 @@ public class ArticleCommentService {
     public void saveArticleComment(ArticleCommentDto dto) {
         try {
             Article article = articleRepository.getReferenceById(dto.getArticleId());
-            UserAccount userAccount = UserAccount.of("uno", "{noop}asdf1234", "uno@mail.com", "Uno", "memo");
+            UserAccount userAccount = userAccountRepository.getReferenceById(dto.getUserAccountDto().getUserId());
             ArticleComment articleComment = dto.toEntity(article, userAccount);
-            articleCommentRepository.save(articleComment);
-
+            if(dto.getParentCommentId() != null) {
+                ArticleComment parentComment = articleCommentRepository.getReferenceById(dto.getParentCommentId());
+                parentComment.getChildComments().add(articleComment);
+            }else {
+                articleCommentRepository.save(articleComment);
+            }
         }catch (EntityNotFoundException e){
             log.warn("댓글 저장 실패. 댓글 작성에 필요한 정보를 찾을 수 없습니다 - {}", e.getLocalizedMessage());
         }
