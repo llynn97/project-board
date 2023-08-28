@@ -56,6 +56,7 @@ public class ArticleController {
         map.addAttribute("article", article);
         map.addAttribute("articleComments", article.getArticleCommentsResponse());
         map.addAttribute("searchTypeHashtag",SearchType.HASHTAG);
+        map.addAttribute("totalCount",articleService.getArticleCount());
         return "articles/detail";
     }
 
