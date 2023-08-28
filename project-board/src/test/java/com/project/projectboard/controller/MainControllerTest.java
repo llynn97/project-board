@@ -1,6 +1,7 @@
 package com.project.projectboard.controller;
 
 import com.project.projectboard.config.SecurityConfig;
+import com.project.projectboard.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("View 루트 컨트롤러")
 @WebMvcTest(MainController.class)
-@Import(SecurityConfig.class)
+@Import(TestSecurityConfig.class)
 class MainControllerTest {
 
     private final MockMvc mvc;
